@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title"><img class="pic-logo" src="@/assets/login/logo.png" alt="logo"></h3>
       </div>
 
       <el-form-item prop="username">
@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="输入账号"
           name="username"
           type="text"
           tabindex="1"
@@ -31,7 +31,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="输入密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -45,22 +45,27 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
       <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
+        <el-checkbox label="apple">
+          记住密码
+        </el-checkbox>
 
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
+        <span class="link-type" @click="ForGetPassword()">忘记密码</span>
       </div>
+
+      <el-button
+        :loading="loading"
+        type="default"
+        style="
+      width:30%;
+      display: block;
+      margin: 40px auto 0px auto;
+      color: #fff;
+      font-size: medium;
+      font-weight: 600;
+      background-color: rgba(0,128,0,0.698039);"
+        @click.native.prevent="handleLogin"
+      >登陆</el-button>
     </el-form>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
@@ -83,7 +88,7 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('账号或密码错误'))
       } else {
         callback()
       }
@@ -177,6 +182,9 @@ export default {
         }
         return acc
       }, {})
+    },
+    ForGetPassword() {
+      console.log('忘记密码')
     }
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {
@@ -244,11 +252,12 @@ $cursor: #fff;
     border-radius: 5px;
     color: #454545;
   }
+
 }
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
+$bg:rgba(0, 128, 0, 0.698039215686274);
 $dark_gray:#889aa4;
 $light_gray:#eee;
 
@@ -257,14 +266,19 @@ $light_gray:#eee;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
-
+  .link-type{
+    position: relative;
+    left: 60%;
+  }
   .login-form {
     position: relative;
-    width: 520px;
+    width: 420px;
     max-width: 100%;
-    padding: 160px 35px 0;
-    margin: 0 auto;
+    padding: 35px 20px;
+    margin: 160px auto;
     overflow: hidden;
+    background-color: #fff;
+    border-radius:5px;
   }
 
   .tips {

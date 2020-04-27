@@ -4,6 +4,8 @@
       upload
     </el-button>
     <el-dialog :visible.sync="dialogVisible">
+      <!-- 配置上传图片地址 action  -->
+
       <el-upload
         :multiple="true"
         :file-list="fileList"
