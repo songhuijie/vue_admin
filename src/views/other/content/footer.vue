@@ -46,18 +46,18 @@
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="姓名" min-width="90">
+      <el-table-column label="位置" min-width="90">
         <template slot-scope="{row}">
           <!-- <span class="link-type" @click="handleUpdate(row)">{{ row.type }}</span> -->
-          <span>{{ row.name }}</span>
+          <span>{{ row.position }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="照片" width="200" align="center">
+      <el-table-column label="详情图" width="150px" align="center">
         <template slot-scope="{row}">
           <img :src="row.cover" alt="图片">
         </template>
       </el-table-column>
-      <el-table-column label="编辑时间" align="center" width="200">
+      <el-table-column label="编辑时间" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.updated_at }}</span>
         </template>
@@ -68,6 +68,9 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
+          <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
+            删除
+          </el-button>
 
         </template>
       </el-table-column>
@@ -77,24 +80,18 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-
-        <el-form-item label="输入姓名" prop="username">
-          <el-input v-model="temp.name" />
-        </el-form-item>
         <el-form-item label="上传图片" prop="cover">
           <el-upload ref="upload" label="上传图片" action="" :auto-upload="false" :on-change="changeUpload" accept="image/jpeg,image/gif,image/png,image/bmp">
             <div size="small" class="upload_btn"><div style="height:40px" /><i class="iconfont icon-jiahao" /><p style="line-height:0">上传图片</p></div>
           </el-upload>
           <el-input v-model="temp.cover" type="hidden" class="hiddens" />
+
         </el-form-item>
 
         <el-form-item label="预览图" prop="">
           <img :src="temp.cover">
         </el-form-item>
 
-        <el-form-item label="输入简介" prop="timestamp">
-          <textarea v-model="temp.intro" />
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
@@ -119,8 +116,9 @@
 </template>
 
 <script>
-import { fetchList, updatePhotoWall } from '@/api/side_navigation/photo_wall/photo_wall'
+import { fetchList, createMajor, updateMajor, deleteMajor } from '@/api/other/major/major'
 import { uploadImage } from '@/api/upload/upload'
+
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -179,9 +177,7 @@ export default {
       showReviewer: false,
       temp: {
         id: undefined,
-        name: '',
-        cover: '',
-        intro: ''
+        cover: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -209,10 +205,8 @@ export default {
           data: {
             total: 3,
             items: [
-              { 'id': 1, 'number': 'YW_abc12345678', 'name': '人物姓名', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'intro': '简介' },
-              { 'id': 2, 'number': 'YW_abc12345678', 'name': '人物姓名', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'intro': '简介' },
-              { 'id': 3, 'number': 'YW_abc12345678', 'name': '人物姓名', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'intro': '简介' },
-              { 'id': 4, 'number': 'YW_abc12345678', 'name': '人物姓名', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'intro': '简介' }
+              { 'id': 1, 'number': 'YW_abc12345678', 'position': '首页底部', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'content': '内容' },
+              { 'id': 2, 'number': 'YW_abc12345678', 'position': '其他位置底部', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'content': '内容' }
             ]
           }
 
@@ -273,6 +267,23 @@ export default {
         message: '操作Success',
         type: 'success'
       })
+      deleteMajor(row.id).then(() => {
+        this.$notify({
+          title: 'Success',
+          message: 'Update Successfully',
+          type: 'success',
+          duration: 2000
+        })
+      })
+        .catch(() => {
+          this.$notify({
+            title: 'Success',
+            message: 'Update Successfully',
+            type: 'success',
+            duration: 2000
+          })
+        })
+      row.status = status
     },
     sortChange(data) {
       const { prop, order } = data
@@ -302,7 +313,23 @@ export default {
       })
     },
     createData() {
-      // 添加逻辑
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+        //   this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+        //   this.temp.author = 'vue-element-admin'
+
+          createMajor(this.temp).then(() => {
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -317,7 +344,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updatePhotoWall(tempData, tempData.id).then(() => {
+          updateMajor(tempData, tempData.id).then(() => {
             this.$notify({
               title: 'Success',
               message: 'Update Successfully',

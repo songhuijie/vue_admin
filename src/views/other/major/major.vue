@@ -186,6 +186,7 @@ export default {
       dialogPvVisible: false,
       pvData: [],
       rules: {
+        type: [{ required: true, message: 'type is required', trigger: 'blur' }],
         major: [{ required: true, message: 'major is required', trigger: 'blur' }]
       },
       downloadLoading: false

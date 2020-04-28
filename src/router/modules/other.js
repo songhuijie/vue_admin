@@ -24,12 +24,40 @@ const otherRouter = {
       name: 'contact',
       meta: { title: '联系我们', icon: 'list' }
     },
+
     {
       path: 'content/content',
       component: () => import('@/views/other/content/content'),
       name: 'content',
       meta: { title: '内容管理', icon: 'list' }
+    },
+    {
+      path: 'content/footer',
+      component: () => import('@/views/other/content/footer'),
+      name: 'footer',
+      meta: { title: '内容底部配置', icon: 'list' }
     }
+
+    // {
+    //   path: 'content',
+    //   component: () => import('@/views/other/content/content'),
+    //   name: '',
+    //   meta: { title: '内容管理', icon: 'list' },
+    //   children: [
+    //     {
+    //       path: 'content',
+    //       component: () => import('@/views/other/content/content'),
+    //       name: 'content',
+    //       meta: { title: '内容管理' }
+    //     },
+    //     {
+    //       path: 'footers',
+    //       component: () => import('@/views/other/content/footers'),
+    //       name: 'footer',
+    //       meta: { title: '内容底部配置1' }
+    //     },
+    //   ]
+    // },
 
   ]
 }
