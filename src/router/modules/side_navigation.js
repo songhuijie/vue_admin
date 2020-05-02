@@ -16,19 +16,19 @@ const sideRouter = {
       path: '/data_hospital/data_hospital',
       component: () => import('@/views/side_navigation/data_hospital/data_hospital'),
       name: 'data_hospital',
-      meta: { title: '数据卫院', icon: 'list' }
+      meta: { title: '数据卫院', icon: 'edit' }
     },
     {
       path: '/history/history',
       component: () => import('@/views/side_navigation/history/history'),
       name: 'history',
-      meta: { title: '卫院历史', icon: 'list' }
+      meta: { title: '卫院历史', icon: 'edit' }
     },
     {
       path: '/photo_wall/photo_wall',
       component: () => import('@/views/side_navigation/photo_wall/photo_wall'),
       name: 'photo_wall',
-      meta: { title: '照片墙', icon: 'list' }
+      meta: { title: '照片墙', icon: 'edit' }
     }
 
   ]

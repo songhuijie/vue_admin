@@ -1,28 +1,32 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.importance" placeholder="Imp" clearable style="width: 90px" class="filter-item">
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+      <el-input v-model="listQuery.title" placeholder="编号标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+
+      <el-select v-model="listQuery.enable" placeholder="Enable" clearable class="filter-item" style="width: 130px">
+        <el-option v-for="item in EnableOptions" :key="item.key" :label="item.display_name" :value="item.key" />
       </el-select>
       <el-select v-model="listQuery.type" placeholder="Type" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name+'('+item.key+')'" :value="item.key" />
+        <el-option v-for="item in TypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
       </el-select>
-      <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
+      <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select>
+      </el-select> -->
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
+      <el-button v-waves class="filter-item" type="primary" @click="reset">
+        重置
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
+        Add
+      </el-button> -->
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>
       <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
         reviewer
-      </el-checkbox>
+      </el-checkbox> -->
     </div>
 
     <el-table
@@ -33,66 +37,64 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="序号" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Date" width="150px" align="center">
+      <el-table-column label="编号" width="150" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Title" min-width="150px">
+      <el-table-column label="分类" min-width="90">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
+          <!-- <span class="link-type" @click="handleUpdate(row)">{{ row.type }}</span> -->
+          <span>{{ row.type | typeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110px" align="center">
+      <el-table-column label="标题" width="200" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
+          <span>{{ row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
+      <el-table-column label="封面图" align="center" width="200">
         <template slot-scope="{row}">
-          <span style="color:red;">{{ row.reviewer }}</span>
+          <img :src="row.cover" alt="图片">
         </template>
       </el-table-column>
-      <el-table-column label="Imp" width="80px">
+      <el-table-column label="是否启用" align="center" width="200">
         <template slot-scope="{row}">
-          <svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-        </template>
-      </el-table-column>
-      <el-table-column label="Readings" align="center" width="95">
-        <template slot-scope="{row}">
-          <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
+
+          <el-tag :type="row.enable | enableFilter">
+            {{ row.enable |enableFilter }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Actions" align="center" width="230" class-name="small-padding fixed-width">
+      <el-table-column label="关联时间" prop="created_at" sortable="custom" align="center" width="180" :class-name="getSortClass('created_at')">
+        <template slot-scope="{row}">
+          <span>{{ row.created_at }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="编辑时间" prop="updated_at" sortable="custom" align="center" width="180" :class-name="getSortClass('updated_at')">
+        <template slot-scope="{row}">
+          <span>{{ row.updated_at }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            Edit
+          <el-button v-if="row.enable === 0" type="primary" size="mini" @click="handleModifyStatus(row,'enable')">
+            启用
           </el-button>
-          <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,'published')">
-            Publish
+          <el-button v-if="row.enable === 1" type="default" size="mini" @click="handleModifyStatus(row,'unenable')">
+            取消启用
           </el-button>
-          <el-button v-if="row.status!='draft'" size="mini" @click="handleModifyStatus(row,'draft')">
-            Draft
+          <el-button v-if="row.enable === 0" type="danger" size="mini" @click="handleDelete(row,$index)">
+            移除
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="handleDelete(row,$index)">
-            Delete
-          </el-button>
+
         </template>
       </el-table-column>
     </el-table>
@@ -103,7 +105,7 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="Type" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            <el-option v-for="item in TypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item label="Date" prop="timestamp">
@@ -147,20 +149,34 @@
 </template>
 
 <script>
-import { fetchList, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, updateRotation, deleteRotation } from '@/api/home/rotation/rotation'
 import waves from '@/directive/waves' // waves directive
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
+const TypeOptions = [
+  { key: '', display_name: '全部' },
+  { key: 1, display_name: '简报' },
+  { key: 2, display_name: '科研' },
+  { key: 3, display_name: '主题教育' },
+  { key: 4, display_name: '高原沙棘精神' },
+  { key: 5, display_name: '视频' },
+  { key: 6, display_name: '校园风采' },
+  { key: 7, display_name: '馆藏' },
+  { key: 8, display_name: '无主题' }
+]
+const EnableOptions = [
+  { key: '', display_name: '全部' },
+  { key: 0, display_name: '不启用' },
+  { key: 1, display_name: '启用' }
 ]
 
 // arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
+const TypeKeyValue = TypeOptions.reduce((acc, cur) => {
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
+
+const EnableKeyValue = EnableOptions.reduce((acc, cur) => {
   acc[cur.key] = cur.display_name
   return acc
 }, {})
@@ -179,7 +195,10 @@ export default {
       return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
+      return TypeKeyValue[type]
+    },
+    enableFilter(type) {
+      return EnableKeyValue[type]
     }
   },
   data() {
@@ -187,28 +206,23 @@ export default {
       tableKey: 0,
       list: null,
       total: 0,
+      enable_count: 0,
       listLoading: true,
       listQuery: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
+        enable: undefined,
         type: undefined,
-        sort: '+id'
+        title: undefined
       },
       importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
+      TypeOptions,
+      EnableOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        id: undefined
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -233,9 +247,27 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
+        response = this.$notify({
+          code: 20000,
+          data: {
+            total: 3,
+            data: [
+              { 'id': 1, 'number': 'YW_abc12345678', 'type': 1, 'enable': 1, 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'title': '标题', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png' },
+              { 'id': 2, 'number': 'YW_abc12345678', 'type': 2, 'enable': 0, 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'title': '标题2', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png' },
+              { 'id': 3, 'number': 'YW_abc12345678', 'type': 3, 'enable': 1, 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'title': '标题3', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png' },
+              { 'id': 4, 'number': 'YW_abc12345678', 'type': 4, 'enable': 1, 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'title': '标题4', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png' },
+              { 'id': 5, 'number': 'YW_abc12345678', 'type': 5, 'enable': 1, 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'title': '标题4', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png' }
+            ]
+          },
+          extra: {
+            enable_count: 4
+          }
 
+        })
+        console.log(response.extra.enable_count)
+        this.list = response.data.data
+        this.total = response.data.total
+        this.enable_count = response.extra.enable_count
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -246,26 +278,42 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
+    reset() {
+      this.listQuery.enable = undefined
+      this.listQuery.type = undefined
+      this.listQuery.title = undefined
+      this.getList()
+    },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
-    },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+      if (this.enable_count >= 4 && status === 'enable') {
+        this.$message({
+          message: '启用超最大限制',
+          type: 'success'
+        })
       } else {
-        this.listQuery.sort = '-id'
+        this.$message({
+          message: 'update success',
+          type: 'success'
+        })
+        if (status === 'enable') {
+          row.enable = 1
+          this.enable_count++
+        } else {
+          row.enable = 0
+          this.enable_count--
+        }
+        updateRotation(row, row.id).then(() => {
+          const index = this.list.findIndex(v => v.id === this.temp.id)
+          this.list.splice(index, 1, this.temp)
+          this.dialogFormVisible = false
+          this.$notify({
+            title: 'Success',
+            message: 'Update Successfully',
+            type: 'success',
+            duration: 2000
+          })
+        })
       }
-      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
@@ -287,22 +335,7 @@ export default {
       })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
+
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -314,23 +347,7 @@ export default {
       })
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
-            const index = this.list.findIndex(v => v.id === this.temp.id)
-            this.list.splice(index, 1, this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Update Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
+
     },
     handleDelete(row, index) {
       this.$notify({
@@ -340,40 +357,24 @@ export default {
         duration: 2000
       })
       this.list.splice(index, 1)
-    },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
+      deleteRotation(row.id).then(() => {
+        const index = this.list.findIndex(v => v.id === this.temp.id)
+        this.list.splice(index, 1, this.temp)
+        this.dialogFormVisible = false
+        this.$notify({
+          title: 'Success',
+          message: 'Update Successfully',
+          type: 'success',
+          duration: 2000
         })
-        this.downloadLoading = false
       })
-    },
-    formatJson(filterVal) {
-      return this.list.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j])
-        } else {
-          return v[j]
-        }
-      }))
-    },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  .el-button--mini{
+    width: auto;
+  }
+</style>

@@ -16,33 +16,33 @@ const otherRouter = {
       path: 'major/major',
       component: () => import('@/views/other/major/major'),
       name: 'major',
-      meta: { title: '专业分类管理', icon: 'list' }
+      meta: { title: '专业分类管理', icon: 'edit' }
     },
     {
       path: 'contact/contact',
       component: () => import('@/views/other/contact/contact'),
       name: 'contact',
-      meta: { title: '联系我们', icon: 'list' }
+      meta: { title: '联系我们', icon: 'edit' }
     },
 
     {
       path: 'content/content',
       component: () => import('@/views/other/content/content'),
       name: 'content',
-      meta: { title: '内容管理', icon: 'list' }
+      meta: { title: '内容管理', icon: 'edit' }
     },
     {
       path: 'content/footer',
       component: () => import('@/views/other/content/footer'),
       name: 'footer',
-      meta: { title: '内容底部配置', icon: 'list' }
+      meta: { title: '内容底部配置', icon: 'edit' }
     }
 
     // {
     //   path: 'content',
     //   component: () => import('@/views/other/content/content'),
     //   name: '',
-    //   meta: { title: '内容管理', icon: 'list' },
+    //   meta: { title: '内容管理', icon: 'edit' },
     //   children: [
     //     {
     //       path: 'content',

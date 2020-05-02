@@ -16,43 +16,43 @@ const topRouter = {
       path: '/wei_yuan/wei_yuan',
       component: () => import('@/views/top_navigation/wei_yuan/wei_yuan'),
       name: 'wei_yuan',
-      meta: { title: '卫院概况管理', icon: 'list' }
+      meta: { title: '卫院概况管理', icon: 'edit' }
     },
     {
       path: 'faculty/faculty',
       component: () => import('@/views/top_navigation/faculty/faculty'),
       name: 'faculty',
-      meta: { title: '院系管理', icon: 'list' }
+      meta: { title: '院系管理', icon: 'edit' }
     },
     {
       path: 'teachers/teachers',
       component: () => import('@/views/top_navigation/teachers/teachers'),
       name: 'teachers',
-      meta: { title: '师资管理', icon: 'list' }
+      meta: { title: '师资管理', icon: 'edit' }
     },
     {
       path: 'students/students',
       component: () => import('@/views/top_navigation/students/students'),
       name: 'students',
-      meta: { title: '招生管理', icon: 'list' }
+      meta: { title: '招生管理', icon: 'edit' }
     },
     {
       path: 'logistics/logistics',
       component: () => import('@/views/top_navigation/logistics/logistics'),
       name: 'logistics',
-      meta: { title: '后勤中心管理', icon: 'list' }
+      meta: { title: '后勤中心管理', icon: 'edit' }
     },
     {
       path: 'school_calendar/school_calendar',
       component: () => import('@/views/top_navigation/school_calendar/school_calendar'),
       name: 'school_calendar',
-      meta: { title: '校历管理', icon: 'list' }
+      meta: { title: '校历管理', icon: 'edit' }
     },
     {
       path: 'notice/notice',
       component: () => import('@/views/top_navigation/notice/notice'),
       name: 'notice',
-      meta: { title: '公告管理', icon: 'list' }
+      meta: { title: '公告管理', icon: 'edit' }
     }
 
   ]

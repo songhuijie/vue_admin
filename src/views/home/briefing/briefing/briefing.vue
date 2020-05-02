@@ -15,13 +15,15 @@
         Search
       </el-button> -->
       <el-input v-model="listQuery.title" placeholder="编号标题" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.type" placeholder="视频分类" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in TypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-      </el-select>
-      <el-select v-model="listQuery.is_relation_list" placeholder="关联列表" style="width: 140px" class="filter-item" @change="handleFilter">
+      <el-select v-model="listQuery.is_relation_home" placeholder="关联首页" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in RelationHomeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
       </el-select>
-
+      <el-select v-model="listQuery.is_relation_rotation" placeholder="关联轮播图" style="width: 140px" class="filter-item" @change="handleFilter">
+        <el-option v-for="item in RelationRotationOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+      </el-select>
+      <el-select v-model="listQuery.is_relation_memorabilia" placeholder="关联大事记" style="width: 140px" class="filter-item" @change="handleFilter">
+        <el-option v-for="item in RelationMemorabiliaOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
@@ -61,14 +63,6 @@
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="分类" width="110px" align="center">
-        <template slot-scope="{row}">
-          <el-tag>
-            {{ row.type | typeFilter }}
-          </el-tag>
-        </template>
-      </el-table-column>
       <el-table-column label="标题" min-width="110px">
         <template slot-scope="{row}">
           <!-- <span class="link-type" @click="handleUpdate(row)">{{ row.type }}</span> -->
@@ -81,14 +75,27 @@
           <img :src="row.cover" class="pan-img">
         </template>
       </el-table-column>
-      <el-table-column label="是否关联到列表页" width="110px" align="center">
+      <el-table-column label="是否关联到首页" width="110px" align="center">
         <template slot-scope="{row}">
-          <el-tag :type="row.is_relation_list | statusFilter">
-            {{ row.is_relation_list | relationFilter }}
+          <el-tag :type="row.is_relation_home | statusFilter">
+            {{ row.is_relation_home | relationFilter }}
           </el-tag>
         </template>
       </el-table-column>
-
+      <el-table-column label="是否关联到轮播图" width="110px" align="center">
+        <template slot-scope="{row}">
+          <el-tag :type="row.is_relation_rotation | statusFilter">
+            {{ row.is_relation_rotation | relationFilter }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="是否关联到大事记" width="110px" align="center">
+        <template slot-scope="{row}">
+          <el-tag :type="row.is_relation_memorabilia | statusFilter">
+            {{ row.is_relation_memorabilia | relationFilter }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="编辑时间" align="center" width="95">
 
         <template slot-scope="{row}">
@@ -98,13 +105,27 @@
 
       <el-table-column label="操作" align="center" width="400" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button v-if="row.is_relation_list == 0 " type="primary" size="mini" @click="handleChangeStatus(row,1,4)">
-            关联列表页
+          <el-button v-if="row.is_relation_home == 0 " type="primary" size="mini" @click="handleChangeStatus(row,1,1)">
+            关联首页
           </el-button>
-          <el-button v-if="row.is_relation_list == 1" size="mini">
-            关联列表页
+          <el-button v-if="row.is_relation_home == 1" size="mini">
+            关联首页
           </el-button>
-
+          <el-button v-if="row.is_relation_rotation == 0 " type="primary" size="mini" @click="handleChangeStatus(row,1,2)">
+            关联轮播图
+          </el-button>
+          <el-button v-if="row.is_relation_rotation == 1" size="mini">
+            关联轮播图
+          </el-button>
+          <el-button v-if="row.is_relation_memorabilia == 0 " type="primary" size="mini" @click="handleChangeStatus(row,1,3)">
+            关联大事记
+          </el-button>
+          <el-button v-if="row.is_relation_memorabilia == 1 " size="mini">
+            关联大事记
+          </el-button>
+          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+            编辑
+          </el-button>
           <el-button v-if="row.status!='published'" size="mini" type="success" @click="handleModifyStatus(row,$index)">
             删除
           </el-button>
@@ -157,16 +178,19 @@
 </template>
 
 <script>
-import { fetchList, updateHippophaeVideo, deleteHippophaeVideo } from '@/api/home/hippophae/hippophae_video'
+import { fetchList, createBriefing, updateBriefing, deleteBriefing } from '@/api/home/briefing/briefing'
 import { uploadImage } from '@/api/upload/upload'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 const TypeOptions = [
-  { key: '', display_name: '全部' },
-  { key: 1, display_name: '视频资讯' },
-  { key: 2, display_name: '衛視' }
+  { key: 1, display_name: '护理系' },
+  { key: 2, display_name: '临床医学系' },
+  { key: 3, display_name: '医学技术系' },
+  { key: 4, display_name: '药学系' },
+  { key: 5, display_name: '计算机中心' },
+  { key: 6, display_name: '实训中心' }
 ]
 
 const RelationHomeOptions = [
@@ -256,7 +280,6 @@ export default {
       rules: {
         title: [{ required: true, message: 'title is required', trigger: 'blur' }],
         content: [{ required: true, message: 'content is required', trigger: 'blur' }]
-        // cover: [{ required: true, message: 'cover is required', trigger: 'blur' }]
       },
       downloadLoading: false,
       defaultImageUrl: 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
@@ -274,9 +297,9 @@ export default {
           data: {
             total: 3,
             items: [
-              { 'id': 1, 'number': 'YW_abc12345678', 'type': 1, 'title': '迎新晚会', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'is_relation_list': 0, 'is_relation_rotation': 0, 'is_relation_memorabilia': 0, 'content': '内容' },
-              { 'id': 2, 'number': 'YW_abc12345678', 'type': 2, 'title': '迎新晚会', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'is_relation_list': 1, 'is_relation_rotation': 1, 'is_relation_memorabilia': 1, 'content': '内容' },
-              { 'id': 3, 'number': 'YW_abc12345678', 'type': 1, 'title': '迎新晚会', 'cover': '', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'is_relation_list': 0, 'is_relation_rotation': 1, 'is_relation_memorabilia': 1, 'content': '内容' }
+              { 'id': 1, 'number': 'YW_abc12345678', 'title': '简报管理1', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'is_relation_home': 0, 'is_relation_rotation': 0, 'is_relation_memorabilia': 0, 'content': '内容' },
+              { 'id': 2, 'number': 'YW_abc12345678', 'title': '简报管理2', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'is_relation_home': 1, 'is_relation_rotation': 1, 'is_relation_memorabilia': 1, 'content': '内容' },
+              { 'id': 3, 'number': 'YW_abc12345678', 'title': '简报管理3', 'cover': '', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'is_relation_home': 0, 'is_relation_rotation': 1, 'is_relation_memorabilia': 1, 'content': '内容' }
             ]
 
           }
@@ -356,7 +379,7 @@ export default {
         default:
           break
       }
-      updateHippophaeVideo(row, row.id).then(() => {
+      updateBriefing(row, row.id).then(() => {
         this.$notify({
           title: 'Success',
           message: '更新成功',
@@ -381,7 +404,7 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          await deleteHippophaeVideo(row.id)
+          await deleteBriefing(row.id)
           this.rolesList.splice(status, 1)
           this.$message({
             type: 'success',
@@ -405,7 +428,7 @@ export default {
       this.handleFilter()
     },
     reset() {
-      this.listQuery.is_relation_list = undefined
+      this.listQuery.is_relation_home = undefined
       this.listQuery.is_relation_rotation = undefined
       this.listQuery.is_relation_memorabilia = undefined
       this.listQuery.title = undefined
@@ -425,7 +448,23 @@ export default {
       })
     },
     createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+        //   this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
+        //   this.temp.author = 'vue-element-admin'
 
+          createBriefing(this.temp).then(() => {
+            this.list.unshift(this.temp)
+            this.dialogFormVisible = false
+            this.$notify({
+              title: 'Success',
+              message: 'Created Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -436,7 +475,28 @@ export default {
       })
     },
     updateData() {
-
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          updateBriefing(tempData, tempData.id).then(() => {
+            this.$notify({
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+          })
+            .catch(() => {
+              this.$notify({
+                title: 'Success',
+                message: 'Update Successfully',
+                type: 'success',
+                duration: 2000
+              })
+            })
+        }
+      })
     },
     handleDelete(row, index) {
       this.$notify({
