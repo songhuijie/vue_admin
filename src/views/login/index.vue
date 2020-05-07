@@ -45,6 +45,11 @@
         </el-form-item>
       </el-tooltip>
 
+      <el-form-item prop="verifycode">
+        <!-- 注意：prop与input绑定的值一定要一致，否则验证规则中的value会报undefined，因为value即为绑定的input输入值 -->
+        <el-input v-model="loginForm.verifycode" placeholder="请输入验证码" class="identifyinput" />
+      </el-form-item>
+
       <el-form-item>
         <div class="identifybox">
           <div @click="refreshCode">
@@ -92,18 +97,6 @@ import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
 import Captcha from '@/components/Captcha'
 
-// 验证码自定义验证规则
-const validateVerifycode = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入验证码'))
-  } else if (value !== this.identifyCode) {
-    console.log('validateVerifycode:', value)
-    callback(new Error('验证码不正确!'))
-  } else {
-    callback()
-  }
-}
-
 export default {
   name: 'Login',
   components: { SocialSign, Captcha },
@@ -118,6 +111,17 @@ export default {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
         callback(new Error('The password can not be less than 6 digits'))
+      } else {
+        callback()
+      }
+    }
+    // 验证码自定义验证规则
+    const validateVerifycode = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入验证码'))
+      } else if (value !== this.identifyCode) {
+        console.log('validateVerifycode:', value)
+        callback(new Error('验证码不正确!'))
       } else {
         callback()
       }
