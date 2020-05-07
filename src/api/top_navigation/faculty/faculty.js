@@ -8,26 +8,17 @@ export function fetchList(query) {
   })
 }
 
-export function createMajor(data) {
+export function updateFaculty(data, id) {
   return request({
-    url: '/vue-element-admin/article/update',
+    url: '/vue-element-admin/article/update/' + id,
     method: 'post',
     data
   })
 }
-
-export function updateMajor(data, id) {
+export function updateFacultyCover(data, id) {
   return request({
     url: '/vue-element-admin/article/update/' + id,
-    method: 'patch',
+    method: 'post',
     data
   })
 }
-
-export function deleteMajor(id) {
-  return request({
-    url: '/vue-element-admin/article/update/' + id,
-    method: 'delete'
-  })
-}
-

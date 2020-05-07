@@ -8,7 +8,7 @@ export function fetchList(query) {
   })
 }
 
-export function createMajor(data) {
+export function createNotice(data) {
   return request({
     url: '/vue-element-admin/article/update',
     method: 'post',
@@ -16,7 +16,7 @@ export function createMajor(data) {
   })
 }
 
-export function updateMajor(data, id) {
+export function updateNotice(data, id) {
   return request({
     url: '/vue-element-admin/article/update/' + id,
     method: 'patch',
@@ -24,7 +24,7 @@ export function updateMajor(data, id) {
   })
 }
 
-export function deleteMajor(id) {
+export function deleteNotice(id) {
   return request({
     url: '/vue-element-admin/article/update/' + id,
     method: 'delete'

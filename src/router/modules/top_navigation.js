@@ -3,7 +3,7 @@
 import Layout from '@/layout'
 
 const topRouter = {
-  path: '/wei_yuan ',
+  path: '/',
   component: Layout,
   redirect: 'top_navigation/wei_yuan/wei_yuan',
   name: 'Table',
@@ -19,16 +19,44 @@ const topRouter = {
       meta: { title: '卫院概况管理', icon: 'edit' }
     },
     {
-      path: 'faculty/faculty',
-      component: () => import('@/views/top_navigation/faculty/faculty'),
+      path: 'faculty',
+      component: () => import('@/views/top_navigation/faculty/index'),
       name: 'faculty',
-      meta: { title: '院系管理', icon: 'edit' }
+      meta: { title: '院系管理', icon: 'edit' },
+      children: [
+        {
+          path: 'faculty/faculty',
+          component: () => import('@/views/top_navigation/faculty/faculty'),
+          name: 'faculty',
+          meta: { title: '院系' }
+        },
+        {
+          path: 'faculty/cover',
+          component: () => import('@/views/top_navigation/faculty/faculty_cover'),
+          name: 'cover',
+          meta: { title: '院系封面管理' }
+        }
+      ]
     },
     {
       path: 'teachers/teachers',
-      component: () => import('@/views/top_navigation/teachers/teachers'),
+      component: () => import('@/views/top_navigation/teachers/index'),
       name: 'teachers',
-      meta: { title: '师资管理', icon: 'edit' }
+      meta: { title: '师资管理', icon: 'edit' },
+      children: [
+        {
+          path: 'teachers/teachers',
+          component: () => import('@/views/top_navigation/teachers/teachers'),
+          name: 'teachers',
+          meta: { title: '师资管理' }
+        },
+        {
+          path: 'teachers/info',
+          component: () => import('@/views/top_navigation/teachers/teachers_info'),
+          name: 'teacher_info',
+          meta: { title: '整体介绍' }
+        }
+      ]
     },
     {
       path: 'students/students',

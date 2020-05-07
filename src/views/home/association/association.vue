@@ -387,6 +387,7 @@ export default {
               type: 'success',
               duration: 2000
             })
+            this.dialogPicFormVisible = false
           })
             .catch(() => {
               this.$notify({
@@ -395,6 +396,7 @@ export default {
                 type: 'success',
                 duration: 2000
               })
+              this.dialogPicFormVisible = false
             })
         }
       })

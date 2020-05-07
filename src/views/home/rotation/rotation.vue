@@ -37,6 +37,7 @@
       fit
       highlight-current-row
       style="width: 100%;"
+      @sort-change="sortChange"
     >
       <el-table-column label="序号" align="center" width="80">
         <template slot-scope="{row}">
@@ -213,7 +214,8 @@ export default {
         limit: 20,
         enable: undefined,
         type: undefined,
-        title: undefined
+        title: undefined,
+        sort: ''
       },
       importanceOptions: [1, 2, 3],
       TypeOptions,
@@ -368,6 +370,17 @@ export default {
           duration: 2000
         })
       })
+    },
+    sortChange(data) {
+      const { prop } = data
+      this.sortByID(prop)
+    },
+    sortByID(order) {
+      this.listQuery.sort = order
+      this.handleFilter()
+    },
+    getSortClass: function(key) {
+      this.listQuery.sort = key
     }
   }
 }

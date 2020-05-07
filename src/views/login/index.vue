@@ -45,6 +45,15 @@
         </el-form-item>
       </el-tooltip>
 
+      <el-form-item>
+        <div class="identifybox">
+          <div @click="refreshCode">
+            <captcha :identify-code="identifyCode" />
+          </div>
+          <el-button type="text" class="textbtn" @click="refreshCode">看不清，换一张</el-button>
+        </div>
+      </el-form-item>
+
       <div style="position:relative">
         <el-checkbox label="apple">
           记住密码
@@ -81,10 +90,23 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
+import Captcha from '@/components/Captcha'
+
+// 验证码自定义验证规则
+const validateVerifycode = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入验证码'))
+  } else if (value !== this.identifyCode) {
+    console.log('validateVerifycode:', value)
+    callback(new Error('验证码不正确!'))
+  } else {
+    callback()
+  }
+}
 
 export default {
   name: 'Login',
-  components: { SocialSign },
+  components: { SocialSign, Captcha },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
@@ -103,11 +125,17 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '111111',
+        verifycode: ''
       },
+      identifyCodes: '1234567890',
+      identifyCode: '',
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        verifycode: [
+          { required: true, trigger: 'blur', validator: validateVerifycode }
+        ]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -138,6 +166,9 @@ export default {
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
     }
+    // 验证码初始化
+    this.identifyCode = ''
+    this.makeCode(this.identifyCodes, 4)
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
@@ -185,7 +216,26 @@ export default {
     },
     ForGetPassword() {
       console.log('忘记密码')
+    },
+    // 生成随机数
+    randomNum(min, max) {
+      return Math.floor(Math.random() * (max - min) + min)
+    },
+    // 切换验证码
+    refreshCode() {
+      this.identifyCode = ''
+      this.makeCode(this.identifyCodes, 4)
+    },
+    // 生成四位随机验证码
+    makeCode(o, l) {
+      for (let i = 0; i < l; i++) {
+        this.identifyCode += this.identifyCodes[
+          this.randomNum(0, this.identifyCodes.length)
+        ]
+      }
+      console.log(this.identifyCode)
     }
+
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {
     //     const code = getQueryObject(e.newValue)

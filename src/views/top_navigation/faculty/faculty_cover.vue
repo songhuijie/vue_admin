@@ -41,12 +41,12 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="编号" width="150" align="center">
+      <el-table-column label="编号" min-width="150" align="center">
         <template slot-scope="{row}">
           <span>{{ row.number }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="顶部图" min-width="200" align="center">
+      <el-table-column label="顶部图" width="200" align="center">
         <template slot-scope="{row}">
           <img :src="row.cover" alt="图片">
         </template>
@@ -72,11 +72,11 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 70%; margin-left:50px;">
 
-        <el-form-item label="上传" prop="cover">
+        <el-form-item label="上传顶部图" prop="cover">
           <el-upload ref="upload" label="上传图片" action="" :auto-upload="false" :on-change="changeUpload" accept="image/jpeg,image/gif,image/png,image/bmp">
             <div size="small" class="upload_btn"><div style="height:40px" /><i class="iconfont icon-jiahao" /><p style="line-height:0">上传图片</p></div>
           </el-upload>
-          <el-input v-model="temp.path_cover" type="hidden" class="hiddens" />
+          <el-input v-model="temp.cover" type="hidden" class="hiddens" />
         </el-form-item>
 
         <el-form-item label="预览图" prop="">
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { fetchList, updateWYuan } from '@/api/top_navigation/wei_yuan/wei_yuan'
+import { fetchList, updateFacultyCover } from '@/api/top_navigation/faculty/faculty'
 import { uploadImage } from '@/api/upload/upload'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
@@ -165,8 +165,7 @@ export default {
       showReviewer: false,
       temp: {
         id: undefined,
-        cover: '',
-        path_cover: ''
+        cover: ''
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -194,10 +193,7 @@ export default {
           data: {
             total: 3,
             items: [
-              { 'id': 1, 'number': 'YW_abc12345678', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'content': '简介' },
-              { 'id': 2, 'number': 'YW_abc12345678', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'content': '简介' },
-              { 'id': 3, 'number': 'YW_abc12345678', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'content': '简介' },
-              { 'id': 4, 'number': 'YW_abc12345678', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11', 'content': '简介' }
+              { 'id': 1, 'number': 'YW_abc12345678', 'cover': 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png', 'created_at': '2020-04-30 11:11:11', 'updated_at': '2020-04-30 11:11:11' }
             ]
           }
 
@@ -229,12 +225,10 @@ export default {
         // console.log(2);
         // console.log(response.data.url);
 
-        this.temp.path_cover = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
-        this.temp.cover = 'http://a2.att.hudong.com/36/48/19300001357258133412489354717.jpg'
+        this.temp.cover = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
       })
         .catch(response => {
-          this.temp.path_cover = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
-          this.temp.cover = 'http://a2.att.hudong.com/36/48/19300001357258133412489354717.jpg'
+          this.temp.cover = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
 
           // response = this.$notify({
           //   title: 'Success',
@@ -304,7 +298,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateWYuan(tempData, tempData.id).then(() => {
+          updateFacultyCover(tempData, tempData.id).then(() => {
             this.$notify({
               title: 'Success',
               message: 'Update Successfully',
