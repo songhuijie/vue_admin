@@ -3,7 +3,7 @@
 import Layout from '@/layout'
 
 const topRouter = {
-  path: '/',
+  path: '/top_navigation',
   component: Layout,
   redirect: 'top_navigation/wei_yuan/wei_yuan',
   name: 'Table',
