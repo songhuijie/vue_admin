@@ -28,10 +28,10 @@
       <el-button v-waves class="filter-item" type="primary" @click="reset">
         重置
       </el-button>
-
+      <!--
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
-      </el-button>
+      </el-button> -->
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>

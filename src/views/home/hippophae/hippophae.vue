@@ -37,6 +37,12 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         新增
       </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handlePicUpdate">
+        编辑图片
+      </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" @click="handleRelation">
+        关联轮播图
+      </el-button>
       <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         Export
       </el-button>
@@ -184,6 +190,28 @@
       </div>
     </el-dialog>
 
+    <el-dialog :title="textMapPic[dialogPicStatus]" :visible.sync="dialogPicFormVisible">
+      <el-form ref="dataFormPic" :rules="rules" :model="tempPic" label-position="left" label-width="70px" style="width: 80%; margin-left:50px;">
+
+        <el-form-item label="上传底部图片" prop="pic">
+          <el-upload ref="upload" label="上传图片" action="" :auto-upload="false" :on-change="changeUpload" accept="image/jpeg,image/gif,image/png,image/bmp">
+            <div size="small" class="upload_btn"><div style="height:40px" /><i class="iconfont icon-jiahao" /><p style="line-height:0">上传图片</p></div>
+            <img :src="defaultImageUrl" alt="图片">
+          </el-upload>
+          <el-input v-model="tempPic.pic" type="hidden" class="hiddens" />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogPicFormVisible = false">
+          Cancel
+        </el-button>
+        <el-button type="primary" @click="dialogPicStatus==='create'?createData():updatePicData()">
+          Confirm
+        </el-button>
+      </div>
+    </el-dialog>
+
     <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
       <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
         <el-table-column prop="key" label="Channel" />
@@ -197,7 +225,7 @@
 </template>
 
 <script>
-import { fetchList, createEducation, updateEducation, deleteEducation } from '@/api/home/theme_education/theme_education'
+import { fetchList, updateHippophaeVideo, updateHippophaeConfig, deleteHippophaeVideo } from '@/api/home/hippophae/hippophae_video'
 import { uploadImage } from '@/api/upload/upload'
 import Tinymce from '@/components/Tinymce'
 import waves from '@/directive/waves' // waves directive
@@ -299,12 +327,24 @@ export default {
         update: '更新',
         create: '新增'
       },
+      tempPic: {
+        id: undefined,
+        pic: ''
+      },
+      dialogPicFormVisible: false,
+      dialogPicStatus: '',
+      textMapPic: {
+        update: '上传图片',
+        create: 'Create'
+      },
+
       dialogPvVisible: false,
       pvData: [],
       rules: {
         title: [{ required: true, message: 'title is required', trigger: 'blur' }],
         content: [{ required: true, message: 'content is required', trigger: 'blur' }],
-        type: [{ required: true, message: 'type is required', trigger: 'blur' }]
+        type: [{ required: true, message: 'type is required', trigger: 'blur' }],
+        pic: [{ required: true, message: 'pic is required', trigger: 'blur' }]
       },
       downloadLoading: false,
       defaultImageUrl: 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
@@ -358,10 +398,13 @@ export default {
         // console.log(response.data.url);
 
         this.temp.cover = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
+        this.tempPic.pic = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
         this.defaultImageUrl = 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
       })
         .catch(response => {
           this.temp.cover = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
+          this.tempPic.pic = '/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
+
           this.defaultImageUrl = 'https://axure-file.lanhuapp.com/75bb826c-df35-4a34-b9a5-86b4cff4543c__28e3bf0b1943ba0890f45e053338de22.png'
 
           // response = this.$notify({
@@ -404,7 +447,7 @@ export default {
         default:
           break
       }
-      updateEducation(row, row.id).then(() => {
+      updateHippophaeVideo(row, row.id).then(() => {
         this.$notify({
           title: 'Success',
           message: '更新成功',
@@ -422,6 +465,41 @@ export default {
         })
       console.log(name)
     },
+    handlePicUpdate(row) {
+      this.temp = Object.assign({}, row) // copy obj
+      this.dialogPicStatus = 'update'
+      this.dialogPicFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataFormPic'].clearValidate()
+      })
+    },
+    updatePicData() {
+      console.log(1)
+      this.$refs['dataFormPic'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.tempPic)
+          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          updateHippophaeConfig(tempData, tempData.id).then(() => {
+            this.$notify({
+              title: 'Success',
+              message: 'Update Successfully',
+              type: 'success',
+              duration: 2000
+            })
+            this.dialogPicFormVisible = false
+          })
+            .catch(() => {
+              this.$notify({
+                title: 'Success',
+                message: 'Update Successfully',
+                type: 'success',
+                duration: 2000
+              })
+              this.dialogPicFormVisible = false
+            })
+        }
+      })
+    },
     handleModifyStatus(row, status) {
       this.$confirm('Confirm to remove the role?', 'Warning', {
         confirmButtonText: 'Confirm',
@@ -429,7 +507,7 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          await deleteEducation(row.id)
+          await deleteHippophaeVideo(row.id)
           this.rolesList.splice(status, 1)
           this.$message({
             type: 'success',
@@ -473,23 +551,7 @@ export default {
       })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-        //   this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-        //   this.temp.author = 'vue-element-admin'
 
-          createEducation(this.temp).then(() => {
-            this.list.unshift(this.temp)
-            this.dialogFormVisible = false
-            this.$notify({
-              title: 'Success',
-              message: 'Created Successfully',
-              type: 'success',
-              duration: 2000
-            })
-          })
-        }
-      })
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -504,7 +566,7 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateEducation(tempData, tempData.id).then(() => {
+          updateHippophaeVideo(tempData, tempData.id).then(() => {
             this.$notify({
               title: 'Success',
               message: 'Update Successfully',
@@ -522,6 +584,10 @@ export default {
             })
         }
       })
+    },
+    handleRelation() {
+      // 关联轮播图
+      console.log('关联轮播图')
     },
     handleDelete(row, index) {
       this.$notify({

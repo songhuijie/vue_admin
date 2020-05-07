@@ -10,7 +10,7 @@ export function fetchList(query) {
 export function updateHippophaeVideo(id) {
   return request({
     url: '/vue-element-admin/article/update/' + id,
-    method: 'delete'
+    method: 'patch'
   })
 }
 export function deleteHippophaeVideo(id) {
@@ -20,3 +20,9 @@ export function deleteHippophaeVideo(id) {
   })
 }
 
+export function updateHippophaeConfig(id) {
+  return request({
+    url: '/vue-element-admin/article/update',
+    method: 'post'
+  })
+}
