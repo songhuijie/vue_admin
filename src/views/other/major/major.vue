@@ -80,16 +80,22 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;" class="multiple">
         <el-form-item label="Type" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in TypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
+            <el-option v-for="item in TypeOptions" :key="item.selectNumber" :label="item.selectText" :value="item.selectInput" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="专业名称" prop="major">
+        <el-form-item v-if="dialogStatus==='update'" label="专业名" prop="major">
           <el-input v-model="temp.major" />
         </el-form-item>
+
+        <el-form-item v-if="dialogStatus==='create'" label="专业名" prop="major">
+          <el-input v-model="temp.major" />
+        </el-form-item>
+
+        <span v-if="dialogStatus === 'create'" class="add" @click="Add">+</span>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -127,7 +133,6 @@ const TypeOptions = [
   { key: 4, display_name: '药学系' },
   { key: 5, display_name: '计算机中心' },
   { key: 6, display_name: '实训中心' }
-
 ]
 
 // arr to obj, such as { CN : "China", US : "USA" }
@@ -167,6 +172,13 @@ export default {
         type: undefined,
         sort: '+id'
       },
+      newarray: [
+        {
+          selectNumber: 'A.',
+          selectText: '',
+          selectInput: ''
+        }
+      ],
       TypeOptions,
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
@@ -361,7 +373,29 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+    Add: function() {
+      if (this.newarray.length + 1 > 6) {
+        this.$alert('最多输入6项')
+        return
+      } else {
+        this.newarray.push({
+          index: this.newarray.length,
+          value: ''
+        })
+      }
     }
   }
 }
 </script>
+
+<style  scoped>
+
+  .add{
+    position: absolute;
+    right: 30%;
+    top: 40%;
+    font-size: 20px;
+    font-weight: 500;
+  }
+</style>
