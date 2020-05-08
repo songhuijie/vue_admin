@@ -82,11 +82,44 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
 
-        <el-form-item label="输入名称" prop="name">
+        <div
+          v-for="(item, index) in newarray"
+          v-show="dialogStatus === 'create'"
+          :key="index"
+          prop="major"
+        >
+          <el-form-item label="名称|数字">
+
+            <input
+              v-model="item.selectText"
+              type="text"
+              class="input_common"
+            >
+            <input
+              v-model="item.selectInput"
+              type="text"
+              class="input_common"
+            >
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              circle
+              @click="deleteData(item.index)"
+            />
+            <el-button
+              v-if="newarray.length - 1 === index"
+              type="primary"
+              icon="el-icon-edit"
+              circle
+              @click="add"
+            />
+          </el-form-item>
+        </div>
+        <el-form-item v-if="dialogStatus === 'update'" label="名称" prop="name">
           <el-input v-model="temp.name" />
         </el-form-item>
 
-        <el-form-item label="输入数字" prop="num">
+        <el-form-item v-if="dialogStatus === 'update'" label="数字" prop="num">
           <el-input v-model="temp.num" />
         </el-form-item>
 
@@ -166,6 +199,12 @@ export default {
         type: undefined,
         sort: '+id'
       },
+      newarray: [
+        {
+          selectText: '',
+          selectInput: ''
+        }
+      ],
       TypeOptions,
       importanceOptions: [1, 2, 3],
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
@@ -266,6 +305,17 @@ export default {
         id: undefined
       }
     },
+    // 处理批量添加
+    handleData() {
+      var data = []
+      this.newarray.forEach(element => {
+        if (element.selectInput !== undefined && element.selectText !== undefined) {
+          data.push({ name: element.selectText, num: element.selectInput })
+        }
+      })
+
+      return data
+    },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -279,8 +329,8 @@ export default {
         if (valid) {
         //   this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
         //   this.temp.author = 'vue-element-admin'
-
-          createHospital(this.temp).then(() => {
+          var data = { 'data': this.handleData() }
+          createHospital(data).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -361,7 +411,44 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+    add: function() {
+      if (this.newarray.length + 1 > 6) {
+        this.$alert('最多输入6项')
+        return
+      } else {
+        this.newarray.push({
+          index: this.newarray.length
+        })
+      }
+    },
+    // 删除
+    deleteData(index) {
+      if (this.newarray.length - 1 < 3) {
+        this.$alert('至少输入3项')
+        return
+      } else {
+        this.newarray.splice(index, 1)
+      }
     }
   }
 }
 </script>
+
+<style  scoped>
+
+  .add{
+    position: absolute;
+    right: 30%;
+    top: 40%;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .input_common{
+    height: 36px;
+    line-height: 36px;
+    width: 60%;
+    border: 1px solid rgba(205, 205, 205, 1);
+    border-radius: 4px;
+  }
+</style>
