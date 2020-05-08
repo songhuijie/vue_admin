@@ -88,7 +88,10 @@
           :key="index"
           prop="major"
         >
-          <el-form-item label="名称|数字">
+          <el-form-item
+            label="名称----
+           数字"
+          >
 
             <input
               v-model="item.selectText"
