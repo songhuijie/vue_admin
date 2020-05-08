@@ -83,7 +83,7 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;" class="multiple">
         <el-form-item label="Type" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in TypeOptions" :key="item.selectNumber" :label="item.selectText" :value="item.selectInput" />
+            <el-option v-for="item in TypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
           </el-select>
         </el-form-item>
 
@@ -91,11 +91,34 @@
           <el-input v-model="temp.major" />
         </el-form-item>
 
-        <el-form-item v-if="dialogStatus==='create'" label="专业名" prop="major">
-          <el-input v-model="temp.major" />
-        </el-form-item>
+        <div
+          v-for="(item, index) in newarray"
+          v-show="dialogStatus === 'create'"
+          :key="index"
+          prop="major"
+        >
+          <el-form-item label="专业名">
 
-        <span v-if="dialogStatus === 'create'" class="add" @click="Add">+</span>
+            <input
+              v-model="item.selectInput"
+              type="text"
+              class="input_common"
+            >
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              circle
+              @click="deleteData(item.index)"
+            />
+            <el-button
+              v-if="newarray.length - 1 === index"
+              type="primary"
+              icon="el-icon-edit"
+              circle
+              @click="add"
+            />
+          </el-form-item>
+        </div>
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -174,8 +197,6 @@ export default {
       },
       newarray: [
         {
-          selectNumber: 'A.',
-          selectText: '',
           selectInput: ''
         }
       ],
@@ -278,6 +299,18 @@ export default {
         id: undefined
       }
     },
+    // 处理批量添加
+    handleMajor() {
+      var major = ''
+      this.newarray.forEach(element => {
+        if (element.selectInput !== undefined) {
+          major += element.selectInput + ','
+        }
+        console.log(element.selectInput)
+      })
+
+      return major.substring(0, major.lastIndexOf(','))
+    },
     handleCreate() {
       this.resetTemp()
       this.dialogStatus = 'create'
@@ -292,7 +325,8 @@ export default {
         //   this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
         //   this.temp.author = 'vue-element-admin'
 
-          createMajor(this.temp).then(() => {
+          var data = { 'type': this.temp.type, 'major': this.handleMajor() }
+          createMajor(data).then(() => {
             this.list.unshift(this.temp)
             this.dialogFormVisible = false
             this.$notify({
@@ -374,15 +408,23 @@ export default {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     },
-    Add: function() {
+    add: function() {
       if (this.newarray.length + 1 > 6) {
         this.$alert('最多输入6项')
         return
       } else {
         this.newarray.push({
-          index: this.newarray.length,
-          value: ''
+          index: this.newarray.length
         })
+      }
+    },
+    // 删除
+    deleteData(index) {
+      if (this.newarray.length - 1 < 3) {
+        this.$alert('至少输入3项')
+        return
+      } else {
+        this.newarray.splice(index, 1)
       }
     }
   }
@@ -397,5 +439,12 @@ export default {
     top: 40%;
     font-size: 20px;
     font-weight: 500;
+  }
+  .input_common{
+    height: 36px;
+    line-height: 36px;
+    width: 60%;
+    border: 1px solid rgba(205, 205, 205, 1);
+    border-radius: 4px;
   }
 </style>
