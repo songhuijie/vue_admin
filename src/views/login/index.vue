@@ -47,17 +47,26 @@
 
       <el-form-item prop="verifycode">
         <!-- 注意：prop与input绑定的值一定要一致，否则验证规则中的value会报undefined，因为value即为绑定的input输入值 -->
-        <el-input v-model="loginForm.verifycode" placeholder="请输入验证码" class="identifyinput" />
-      </el-form-item>
+        <el-input v-model="loginForm.verifycode" placeholder="请输入验证码" class="identifyinput custom_width" />
+        <div class="identifybox inline">
+          <div class="inline" @click="refreshCode">
+            <captcha :identify-code="identifyCode" class="inline" />
+            <img class="pic-logo" src="@/assets/login/refresh.png" alt="refresh" @click="refreshCode">
 
-      <el-form-item>
-        <div class="identifybox">
-          <div @click="refreshCode">
-            <captcha :identify-code="identifyCode" />
           </div>
-          <el-button type="text" class="textbtn" @click="refreshCode">看不清，换一张</el-button>
+          <!-- <el-button type="text" class="textbtn" @click="refreshCode"><img class="pic-logo" src="@/assets/login/refresh.png" alt="refresh" @click="refreshCode"></el-button> -->
         </div>
       </el-form-item>
+
+      <!-- <el-form-item>
+        <div class="identifybox">
+          <div @click="refreshCode" >
+            <captcha :identify-code="identifyCode" class="inline" />
+            <img class="pic-logo" src="@/assets/login/refresh.png" alt="refresh" @click="refreshCode">
+
+          </div>
+        </div>
+      </el-form-item> -->
 
       <div style="position:relative">
         <el-checkbox label="apple">
@@ -382,6 +391,17 @@ $light_gray:#eee;
     right: 0;
     bottom: 6px;
   }
+
+  .inline{
+    display: inline;
+  }
+  .custom_width{
+    width: 45%;
+  }
+  #s-canvas {
+    position: relative;
+    top: 10px;
+}
 
   @media only screen and (max-width: 470px) {
     .thirdparty-button {
